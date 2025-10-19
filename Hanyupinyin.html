@@ -1,0 +1,789 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>拼音有声挂图 - 互动学习工具</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', 'Microsoft YaHei', sans-serif;
+        }
+        
+        :root {
+            --initial-color: #4a6cf7;
+            --final-color: #10b981;
+            --tone-color: #f59e0b;
+            --light: #f8fafc;
+            --dark: #2d3748;
+            --gray: #718096;
+            --radius: 12px;
+            --shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+            --transition: all 0.3s ease;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #f5f7ff 0%, #e3e9ff 100%);
+            color: var(--dark);
+            line-height: 1.6;
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        header {
+            text-align: center;
+            margin-bottom: 30px;
+            padding: 25px;
+            background: white;
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 5px;
+            background: linear-gradient(90deg, var(--initial-color), var(--final-color), var(--tone-color));
+        }
+        
+        h1 {
+            color: var(--initial-color);
+            margin-bottom: 10px;
+            font-size: 2.5rem;
+            font-weight: 700;
+        }
+        
+        .description {
+            color: var(--gray);
+            font-size: 1.1rem;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+        
+        .main-content {
+            display: grid;
+            grid-template-columns: 1fr 300px;
+            gap: 25px;
+        }
+        
+        @media (max-width: 900px) {
+            .main-content {
+                grid-template-columns: 1fr;
+            }
+        }
+        
+        .pinyin-section {
+            background: white;
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
+            padding: 25px;
+            margin-bottom: 25px;
+        }
+        
+        .section-title {
+            display: flex;
+            align-items: center;
+            font-size: 1.5rem;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #f1f5f9;
+        }
+        
+        .initials-title {
+            color: var(--initial-color);
+        }
+        
+        .finals-title {
+            color: var(--final-color);
+        }
+        
+        .tones-title {
+            color: var(--tone-color);
+        }
+        
+        .section-title i {
+            margin-right: 10px;
+            color: white;
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .initials-title i {
+            background: var(--initial-color);
+        }
+        
+        .finals-title i {
+            background: var(--final-color);
+        }
+        
+        .tones-title i {
+            background: var(--tone-color);
+        }
+        
+        .pinyin-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(90px, 1fr));
+            gap: 15px;
+        }
+        
+        .pinyin-item {
+            background: white;
+            border-radius: var(--radius);
+            padding: 20px 10px;
+            text-align: center;
+            cursor: pointer;
+            transition: var(--transition);
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+            border: 2px solid transparent;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100px;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .pinyin-item::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 4px;
+            transform: scaleX(0);
+            transition: var(--transition);
+        }
+        
+        .initial-item {
+            border-color: rgba(74, 108, 247, 0.2);
+        }
+        
+        .initial-item::before {
+            background: var(--initial-color);
+        }
+        
+        .initial-item:hover {
+            border-color: var(--initial-color);
+        }
+        
+        .final-item {
+            border-color: rgba(16, 185, 129, 0.2);
+        }
+        
+        .final-item::before {
+            background: var(--final-color);
+        }
+        
+        .final-item:hover {
+            border-color: var(--final-color);
+        }
+        
+        .pinyin-item:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+        }
+        
+        .pinyin-item:hover::before {
+            transform: scaleX(1);
+        }
+        
+        .pinyin-item.active {
+            transform: translateY(-2px);
+        }
+        
+        .initial-item.active {
+            background: rgba(74, 108, 247, 0.05);
+            border-color: var(--initial-color);
+        }
+        
+        .initial-item.active::before {
+            transform: scaleX(1);
+        }
+        
+        .final-item.active {
+            background: rgba(16, 185, 129, 0.05);
+            border-color: var(--final-color);
+        }
+        
+        .final-item.active::before {
+            transform: scaleX(1);
+        }
+        
+        .pinyin-char {
+            font-size: 2.2rem;
+            font-weight: 700;
+            color: var(--dark);
+            margin-bottom: 5px;
+        }
+        
+        .pinyin-label {
+            font-size: 0.9rem;
+            color: var(--gray);
+        }
+        
+        .sidebar {
+            background: white;
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
+            padding: 25px;
+            height: fit-content;
+            position: sticky;
+            top: 20px;
+        }
+        
+        .tone-examples {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            margin-bottom: 25px;
+        }
+        
+        .tone-example-group {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        
+        .tone-example-title {
+            font-size: 1rem;
+            font-weight: 600;
+            color: var(--tone-color);
+            margin-bottom: 5px;
+            text-align: center;
+        }
+        
+        .tone-examples-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr 1fr;
+            gap: 10px;
+        }
+        
+        .tone-example-item {
+            border-radius: var(--radius);
+            padding: 15px 5px;
+            text-align: center;
+            cursor: pointer;
+            transition: var(--transition);
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            border: 2px solid transparent;
+            background: white;
+        }
+        
+        .tone-example-item:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 15px rgba(0, 0, 0, 0.1);
+        }
+        
+        .tone-example-item.active {
+            transform: scale(1.05);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.15);
+            background: rgba(245, 158, 11, 0.05);
+            border-color: var(--tone-color);
+        }
+        
+        .tone-example-char {
+            font-size: 1.8rem;
+            font-weight: 700;
+            margin-bottom: 5px;
+        }
+        
+        .tone-example-label {
+            font-size: 0.8rem;
+            color: var(--gray);
+        }
+        
+        .instructions {
+            background: #f8fafc;
+            border-radius: var(--radius);
+            padding: 20px;
+            margin-top: 20px;
+        }
+        
+        .instructions h3 {
+            color: var(--initial-color);
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+        }
+        
+        .instructions h3 i {
+            margin-right: 10px;
+            color: var(--final-color);
+        }
+        
+        .instructions ul {
+            padding-left: 20px;
+        }
+        
+        .instructions li {
+            margin-bottom: 10px;
+            color: var(--gray);
+        }
+        
+        .play-button {
+            background: var(--initial-color);
+            color: white;
+            border: none;
+            border-radius: 50px;
+            padding: 12px 25px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 20px auto 0;
+            box-shadow: 0 4px 10px rgba(74, 108, 247, 0.3);
+        }
+        
+        .play-button:hover {
+            background: var(--final-color);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 15px rgba(16, 185, 129, 0.4);
+        }
+        
+        .play-button i {
+            margin-right: 8px;
+        }
+        
+        .current-playing {
+            background: #f0f7ff;
+            border-radius: var(--radius);
+            padding: 15px;
+            margin-top: 20px;
+            text-align: center;
+            border-left: 4px solid var(--initial-color);
+        }
+        
+        .current-playing h4 {
+            color: var(--initial-color);
+            margin-bottom: 5px;
+        }
+        
+        .current-playing p {
+            color: var(--gray);
+            font-size: 0.9rem;
+        }
+        
+        footer {
+            text-align: center;
+            margin-top: 40px;
+            padding: 20px;
+            color: var(--gray);
+            font-size: 0.9rem;
+        }
+        
+        @media (max-width: 768px) {
+            .pinyin-grid {
+                grid-template-columns: repeat(auto-fill, minmax(80px, 1fr));
+            }
+            
+            .pinyin-item {
+                min-height: 85px;
+                padding: 15px 5px;
+            }
+            
+            .pinyin-char {
+                font-size: 1.8rem;
+            }
+            
+            h1 {
+                font-size: 2rem;
+            }
+            
+            .tone-examples-row {
+                grid-template-columns: 1fr 1fr;
+            }
+        }
+        
+        .audio-controls {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin-top: 15px;
+        }
+        
+        .control-btn {
+            background: white;
+            border: 1px solid #e2e8f0;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: var(--transition);
+            color: var(--initial-color);
+        }
+        
+        .control-btn:hover {
+            background: var(--initial-color);
+            color: white;
+            transform: scale(1.1);
+        }
+        
+        /* 拼音字母的特殊样式 */
+        .pinyin-char {
+            font-family: 'Microsoft YaHei', 'Segoe UI', sans-serif;
+        }
+        
+        /* 拼音字母的特殊样式 - 为ü等字母特别设计 */
+        .pinyin-char[data-char="ü"],
+        .pinyin-char[data-char="ǖ"],
+        .pinyin-char[data-char="ǘ"],
+        .pinyin-char[data-char="ǚ"],
+        .pinyin-char[data-char="ǜ"] {
+            color: #e11d48;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1><i class="fas fa-language"></i> 拼音有声挂图</h1>
+            <p class="description">互动式拼音学习工具 - 专为教师和学生设计</p>
+        </header>
+        
+        <div class="main-content">
+            <div class="content-left">
+                <div class="pinyin-section">
+                    <h2 class="section-title initials-title"><i class="fas fa-volume-up"></i> 声母</h2>
+                    <div class="pinyin-grid" id="initials-container">
+                        <!-- 声母将通过JavaScript动态生成 -->
+                    </div>
+                </div>
+                
+                <div class="pinyin-section">
+                    <h2 class="section-title finals-title"><i class="fas fa-microphone-alt"></i> 韵母</h2>
+                    <div class="pinyin-grid" id="finals-container">
+                        <!-- 韵母将通过JavaScript动态生成 -->
+                    </div>
+                </div>
+            </div>
+            
+            <div class="sidebar">
+                <h2 class="section-title tones-title"><i class="fas fa-music"></i> 声调示例</h2>
+                <div class="tone-examples">
+                    <div class="tone-example-group">
+                        <div class="tone-example-title">四声示例</div>
+                        <div class="tone-examples-row" id="m-tone-examples">
+                            <!-- m声调示例将通过JavaScript动态生成 -->
+                        </div>
+                    </div>
+                </div>
+                
+                <button class="play-button" id="play-all">
+                    <i class="fas fa-play-circle"></i> 播放全部拼音
+                </button>
+                
+                <div class="current-playing">
+                    <h4>当前播放</h4>
+                    <p id="current-audio">无</p>
+                </div>
+                
+                <div class="audio-controls">
+                    <div class="control-btn" id="volume-up">
+                        <i class="fas fa-volume-up"></i>
+                    </div>
+                    <div class="control-btn" id="volume-down">
+                        <i class="fas fa-volume-down"></i>
+                    </div>
+                    <div class="control-btn" id="stop-audio">
+                        <i class="fas fa-stop"></i>
+                    </div>
+                </div>
+                
+                <div class="instructions">
+                    <h3><i class="fas fa-info-circle"></i> 使用说明</h3>
+                    <ul>
+                        <li>点击声母或韵母按钮可以听到对应的发音</li>
+                        <li>点击声调示例按钮可以听到不同声调的发音</li>
+                        <li>使用控制按钮调整音量或停止播放</li>
+                        <li>点击"播放全部拼音"可以连续播放所有拼音</li>
+                        <li>本挂图适合拼音教学和发音练习使用</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        
+        <footer>
+            <p>拼音有声挂图 &copy; 2023 - 专为教育设计</p>
+        </footer>
+    </div>
+
+    <script>
+        // 拼音数据 - 使用汉语拼音字母写法
+        const pinyinData = {
+            initials: [
+                { char: "b", label: "玻", audio: "bo1.mp3" },
+                { char: "p", label: "坡", audio: "po1.mp3" },
+                { char: "m", label: "摸", audio: "mo1.mp3" },
+                { char: "f", label: "佛", audio: "fo1.mp3" },
+                { char: "d", label: "得", audio: "de1.mp3" },
+                { char: "t", label: "特", audio: "te1.mp3" },
+                { char: "n", label: "讷", audio: "ne1.mp3" },
+                { char: "l", label: "勒", audio: "le1.mp3" },
+                { char: "g", label: "哥", audio: "ge1.mp3" },
+                { char: "k", label: "科", audio: "ke1.mp3" },
+                { char: "h", label: "喝", audio: "he1.mp3" },
+                { char: "j", label: "基", audio: "ji1.mp3" },
+                { char: "q", label: "欺", audio: "qi1.mp3" },
+                { char: "x", label: "希", audio: "xi1.mp3" },
+                { char: "zh", label: "知", audio: "zhi1.mp3" },
+                { char: "ch", label: "蚩", audio: "chi1.mp3" },
+                { char: "sh", label: "诗", audio: "shi1.mp3" },
+                { char: "r", label: "日", audio: "ri1.mp3" },
+                { char: "z", label: "资", audio: "zi1.mp3" },
+                { char: "c", label: "雌", audio: "ci1.mp3" },
+                { char: "s", label: "思", audio: "si1.mp3" }
+            ],
+            // 韵母按照标准顺序排列
+            finals: [
+                // 单韵母
+                { char: "a", label: "啊", audio: "a.mp3" },
+                { char: "o", label: "喔", audio: "o.mp3" },
+                { char: "e", label: "鹅", audio: "e.mp3" },
+                { char: "er", label: "儿", audio: "er1.mp3" },
+                { char: "i", label: "衣", audio: "i.mp3" },
+                { char: "u", label: "乌", audio: "u.mp3" },
+                { char: "ü", label: "迂", audio: "yu.mp3" },
+                
+                // 复韵母
+                { char: "ai", label: "哀", audio: "ai1.mp3" },
+                { char: "ei", label: "欸", audio: "ei1.mp3" },
+                { char: "ao", label: "熬", audio: "ao1.mp3" },
+                { char: "ou", label: "欧", audio: "ou1.mp3" },
+                
+                // 前响复韵母
+                { char: "ia", label: "呀", audio: "ia1.mp3" },
+                { char: "ie", label: "耶", audio: "ie1.mp3" },
+                { char: "ua", label: "蛙", audio: "ua1.mp3" },
+                { char: "uo", label: "窝", audio: "uo1.mp3" },
+                { char: "üe", label: "约", audio: "ue1.mp3" },
+                
+                // 中响复韵母
+                { char: "iao", label: "腰", audio: "iao1.mp3" },
+                { char: "iou", label: "优", audio: "you1.mp3" },
+                { char: "uai", label: "歪", audio: "uai1.mp3" },
+                { char: "uei", label: "威", audio: "ui1.mp3" },
+                
+                // 鼻韵母 - 前鼻音
+                { char: "an", label: "安", audio: "an1.mp3" },
+                { char: "ian", label: "烟", audio: "ian1.mp3" },
+                { char: "uan", label: "弯", audio: "uan1.mp3" },
+                { char: "üan", label: "冤", audio: "yuan1.mp3" },
+                { char: "en", label: "恩", audio: "en1.mp3" },
+                { char: "in", label: "因", audio: "in1.mp3" },
+                { char: "uen", label: "温", audio: "un1.mp3" },
+                { char: "ün", label: "晕", audio: "yuan1.mp3" },
+                
+                // 鼻韵母 - 后鼻音
+                { char: "ang", label: "昂", audio: "ang1.mp3" },
+                { char: "iang", label: "央", audio: "iang1.mp3" },
+                { char: "uang", label: "汪", audio: "uang1.mp3" },
+                { char: "eng", label: "亨", audio: "eng1.mp3" },
+                { char: "ing", label: "英", audio: "ing1.mp3" },
+                { char: "ueng", label: "翁", audio: "weng1.mp3" },
+                { char: "ong", label: "轰", audio: "ong1.mp3" },
+                { char: "iong", label: "雍", audio: "iong1.mp3" }
+            ],
+            // 声调示例 - 只保留m示例
+            toneExamples: {
+                m: [
+                    { char: "mā", label: "一声", audio: "ma1.mp3" },
+                    { char: "má", label: "二声", audio: "ma2.mp3" },
+                    { char: "mǎ", label: "三声", audio: "ma3.mp3" },
+                    { char: "mà", label: "四声", audio: "ma4.mp3" }
+                ]
+            }
+        };
+
+        let currentAudio = null;
+        let volume = 0.7;
+
+        // 创建拼音元素
+        function createPinyinElement(item, container, type) {
+            const element = document.createElement('div');
+            element.className = `pinyin-item ${type}-item`;
+            element.innerHTML = `
+                <div class="pinyin-char" data-char="${item.char}">${item.char}</div>
+                <div class="pinyin-label">${item.label}</div>
+            `;
+            
+            element.addEventListener('click', function() {
+                // 移除其他激活状态
+                const activeItems = container.querySelectorAll('.active');
+                activeItems.forEach(item => item.classList.remove('active'));
+                
+                // 添加当前激活状态
+                this.classList.add('active');
+                
+                // 播放音频
+                if (item.audio) {
+                    playAudio(item.audio, `${item.char} (${item.label})`);
+                }
+            });
+            
+            return element;
+        }
+
+        // 创建声调示例元素
+        function createToneExampleElement(item, container) {
+            const element = document.createElement('div');
+            element.className = 'tone-example-item';
+            element.innerHTML = `
+                <div class="tone-example-char">${item.char}</div>
+                <div class="tone-example-label">${item.label}</div>
+            `;
+            
+            element.addEventListener('click', function() {
+                // 移除其他激活状态
+                const activeItems = container.querySelectorAll('.active');
+                activeItems.forEach(item => item.classList.remove('active'));
+                
+                // 添加当前激活状态
+                this.classList.add('active');
+                
+                // 播放音频
+                if (item.audio) {
+                    playAudio(item.audio, `${item.char} (${item.label})`);
+                }
+            });
+            
+            return element;
+        }
+
+        // 播放音频
+        function playAudio(filename, displayName = "音频") {
+            // 停止当前播放的音频
+            if (currentAudio) {
+                currentAudio.pause();
+            }
+            
+            // 更新当前播放显示
+            document.getElementById('current-audio').textContent = displayName;
+            
+            // 创建新的音频对象
+            currentAudio = new Audio(filename);
+            currentAudio.volume = volume;
+            
+            currentAudio.play().catch(e => {
+                console.log("音频播放失败: ", e);
+                document.getElementById('current-audio').textContent = `无法播放: ${filename}`;
+            });
+            
+            currentAudio.onended = function() {
+                document.getElementById('current-audio').textContent = "无";
+            };
+        }
+
+        // 初始化页面
+        document.addEventListener('DOMContentLoaded', function() {
+            const initialsContainer = document.getElementById('initials-container');
+            const finalsContainer = document.getElementById('finals-container');
+            const mToneExamplesContainer = document.getElementById('m-tone-examples');
+            const playAllButton = document.getElementById('play-all');
+            const volumeUp = document.getElementById('volume-up');
+            const volumeDown = document.getElementById('volume-down');
+            const stopAudio = document.getElementById('stop-audio');
+            
+            // 添加声母
+            pinyinData.initials.forEach(item => {
+                initialsContainer.appendChild(createPinyinElement(item, initialsContainer, 'initial'));
+            });
+            
+            // 添加韵母
+            pinyinData.finals.forEach(item => {
+                finalsContainer.appendChild(createPinyinElement(item, finalsContainer, 'final'));
+            });
+            
+            // 添加m声调示例
+            pinyinData.toneExamples.m.forEach(item => {
+                mToneExamplesContainer.appendChild(createToneExampleElement(item, mToneExamplesContainer));
+            });
+            
+            // 播放全部拼音
+            playAllButton.addEventListener('click', function() {
+                let index = 0;
+                const allItems = [...pinyinData.initials, ...pinyinData.finals];
+                
+                function playNext() {
+                    if (index < allItems.length) {
+                        const item = allItems[index];
+                        playAudio(item.audio, `${item.char} (${item.label})`);
+                        
+                        // 高亮显示当前播放项
+                        const allElements = document.querySelectorAll('.pinyin-item');
+                        allElements.forEach(el => el.classList.remove('active'));
+                        
+                        // 查找对应的元素并高亮
+                        const charElement = [...allElements].find(el => 
+                            el.querySelector('.pinyin-char').textContent === item.char);
+                        if (charElement) {
+                            charElement.classList.add('active');
+                        }
+                        
+                        index++;
+                        setTimeout(playNext, 1500);
+                    } else {
+                        document.getElementById('current-audio').textContent = "播放完成";
+                    }
+                }
+                
+                playNext();
+            });
+            
+            // 音量控制
+            volumeUp.addEventListener('click', function() {
+                if (volume < 1) {
+                    volume = Math.min(1, volume + 0.1);
+                    if (currentAudio) {
+                        currentAudio.volume = volume;
+                    }
+                }
+            });
+            
+            volumeDown.addEventListener('click', function() {
+                if (volume > 0) {
+                    volume = Math.max(0, volume - 0.1);
+                    if (currentAudio) {
+                        currentAudio.volume = volume;
+                    }
+                }
+            });
+            
+            // 停止音频
+            stopAudio.addEventListener('click', function() {
+                if (currentAudio) {
+                    currentAudio.pause();
+                    document.getElementById('current-audio').textContent = "已停止";
+                }
+            });
+        });
+    </script>
+</body>
+</html>
