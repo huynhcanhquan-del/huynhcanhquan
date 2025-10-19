@@ -17,6 +17,7 @@
             --initial-color: #4a6cf7;
             --final-color: #10b981;
             --tone-color: #f59e0b;
+            --song-color: #8b5cf6;
             --light: #f8fafc;
             --dark: #2d3748;
             --gray: #718096;
@@ -56,7 +57,7 @@
             left: 0;
             width: 100%;
             height: 5px;
-            background: linear-gradient(90deg, var(--initial-color), var(--final-color), var(--tone-color));
+            background: linear-gradient(90deg, var(--initial-color), var(--final-color), var(--tone-color), var(--song-color));
         }
         
         h1 {
@@ -114,6 +115,10 @@
             color: var(--tone-color);
         }
         
+        .song-title {
+            color: var(--song-color);
+        }
+        
         .section-title i {
             margin-right: 10px;
             color: white;
@@ -135,6 +140,10 @@
         
         .tones-title i {
             background: var(--tone-color);
+        }
+        
+        .song-title i {
+            background: var(--song-color);
         }
         
         .pinyin-grid {
@@ -312,6 +321,44 @@
         .tone-example-label {
             font-size: 0.8rem;
             color: var(--gray);
+        }
+        
+        .song-section {
+            background: white;
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
+            padding: 20px;
+            margin-top: 20px;
+            text-align: center;
+            border-left: 4px solid var(--song-color);
+        }
+        
+        .song-button {
+            background: var(--song-color);
+            color: white;
+            border: none;
+            border-radius: 50px;
+            padding: 15px 30px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 10px auto;
+            box-shadow: 0 4px 10px rgba(139, 92, 246, 0.3);
+            width: 100%;
+        }
+        
+        .song-button:hover {
+            background: #7c3aed;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 15px rgba(139, 92, 246, 0.4);
+        }
+        
+        .song-button i {
+            margin-right: 10px;
         }
         
         .instructions {
@@ -496,6 +543,13 @@
                     </div>
                 </div>
                 
+                <div class="song-section">
+                    <h2 class="section-title song-title"><i class="fas fa-music"></i> 汉语拼音歌</h2>
+                    <button class="song-button" id="play-song">
+                        <i class="fas fa-play-circle"></i> 播放拼音歌
+                    </button>
+                </div>
+                
                 <button class="play-button" id="play-all">
                     <i class="fas fa-play-circle"></i> 播放全部拼音
                 </button>
@@ -522,6 +576,7 @@
                     <ul>
                         <li>点击声母或韵母按钮可以听到对应的发音</li>
                         <li>点击声调示例按钮可以听到不同声调的发音</li>
+                        <li>点击"播放拼音歌"可以欣赏汉语拼音歌曲</li>
                         <li>使用控制按钮调整音量或停止播放</li>
                         <li>点击"播放全部拼音"可以连续播放所有拼音</li>
                         <li>本挂图适合拼音教学和发音练习使用</li>
@@ -599,7 +654,7 @@
                 { char: "en", label: "恩", audio: "en1.mp3" },
                 { char: "in", label: "因", audio: "in1.mp3" },
                 { char: "uen", label: "温", audio: "un1.mp3" },
-                { char: "ün", label: "晕", audio: "yuan1.mp3" },
+                { char: "ün", label: "晕", audio: "uyn.mp3" },
                 
                 // 鼻韵母 - 后鼻音
                 { char: "ang", label: "昂", audio: "ang1.mp3" },
@@ -619,6 +674,11 @@
                     { char: "mǎ", label: "三声", audio: "ma3.mp3" },
                     { char: "mà", label: "四声", audio: "ma4.mp3" }
                 ]
+            },
+            // 汉语拼音歌
+            song: {
+                name: "汉语拼音歌",
+                audio: "pinyinge.mp3"
             }
         };
 
@@ -707,6 +767,7 @@
             const finalsContainer = document.getElementById('finals-container');
             const mToneExamplesContainer = document.getElementById('m-tone-examples');
             const playAllButton = document.getElementById('play-all');
+            const playSongButton = document.getElementById('play-song');
             const volumeUp = document.getElementById('volume-up');
             const volumeDown = document.getElementById('volume-down');
             const stopAudio = document.getElementById('stop-audio');
@@ -755,6 +816,11 @@
                 }
                 
                 playNext();
+            });
+            
+            // 播放拼音歌
+            playSongButton.addEventListener('click', function() {
+                playAudio(pinyinData.song.audio, pinyinData.song.name);
             });
             
             // 音量控制
